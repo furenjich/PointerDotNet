@@ -15,7 +15,7 @@ namespace PointerDotNet
         }
         public static IntPtr hProc(this Process pro)
         {
-           
+
             return WinApi.GethProc(WinApi.ProcessAccessFlags.All, false, pro.Id);
         }
         public static class WinApi
@@ -33,7 +33,7 @@ namespace PointerDotNet
        bool bInheritHandle,
        int processId)
             {
-                
+
                 if (registerdopenprocessid.Contains(processId))
                 {
                     return registerdopenprocessidtoprocesshproc[processId];
@@ -88,8 +88,8 @@ out IntPtr lpNumberOfBytesWritten);
         public IntPtr BaseAddress;
         public IntPtr PointerAddress = IntPtr.Zero;
         public IntPtr[] Offset;
-      
-        public Pointer(IntPtr hProc, IntPtr BaseAddress,int[] Offset)
+
+        public Pointer(IntPtr hProc, IntPtr BaseAddress, int[] Offset)
         {
 
             this.hProc = hProc;
@@ -98,15 +98,19 @@ out IntPtr lpNumberOfBytesWritten);
             Offset.CopyTo(ptroffset, 0);
             this.Offset = ptroffset;
         }
-     
-        public Pointer(Process pr,int[] Offset)
+
+        public Pointer(Process pr, IntPtr Address, int[] Offset)
         {
 
             this.hProc = pr.hProc();
-            this.BaseAddress = pr.MainModule.BaseAddress;
-            IntPtr[] ptroffset = new IntPtr[Offset.Length];
-            Offset.CopyTo(ptroffset, 0);
-            this.Offset = ptroffset;
+            this.BaseAddress = pr.MainModule.BaseAddress.Add(Address);
+            List<IntPtr> tempoffsetforptr = new List<IntPtr>();
+            foreach (var a in Offset)
+            {
+                tempoffsetforptr.Add((IntPtr)a);
+            }
+
+            this.Offset = tempoffsetforptr.ToArray();
         }
         public IntPtr GetAddress()
         {
@@ -188,7 +192,7 @@ out IntPtr lpNumberOfBytesWritten);
             return GetValueT<short>();
         }
 
-        
+
         public ushort GetUShort()
         {
             return GetValueT<ushort>();
@@ -208,7 +212,7 @@ out IntPtr lpNumberOfBytesWritten);
 
         public T GetValueT<T>()
         {
-            
+
             IntPtr PtrAddr = getptraddr();
 
             byte[] buffer = new byte[32];
