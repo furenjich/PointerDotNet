@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -88,14 +88,26 @@ out IntPtr lpNumberOfBytesWritten);
         public IntPtr BaseAddress;
         public IntPtr PointerAddress = IntPtr.Zero;
         public IntPtr[] Offset;
-        public Pointer(IntPtr hProc, IntPtr BaseAddress, IntPtr[] Offset)
+      
+        public Pointer(IntPtr hProc, IntPtr BaseAddress,int[] Offset)
         {
 
             this.hProc = hProc;
             this.BaseAddress = BaseAddress;
-            this.Offset = Offset;
+            IntPtr[] ptroffset = new IntPtr[Offset.Length];
+            Offset.CopyTo(ptroffset, 0);
+            this.Offset = ptroffset;
         }
+     
+        public Pointer(Process pr,int[] Offset)
+        {
 
+            this.hProc = pr.hProc();
+            this.BaseAddress = pr.MainModule.BaseAddress;
+            IntPtr[] ptroffset = new IntPtr[Offset.Length];
+            Offset.CopyTo(ptroffset, 0);
+            this.Offset = ptroffset;
+        }
         public IntPtr GetAddress()
         {
             IntPtr temp;
@@ -176,7 +188,7 @@ out IntPtr lpNumberOfBytesWritten);
             return GetValueT<short>();
         }
 
-
+        
         public ushort GetUShort()
         {
             return GetValueT<ushort>();
@@ -247,6 +259,50 @@ out IntPtr lpNumberOfBytesWritten);
                 return (T)(object)BitConverter.ToUInt64(buffer, 0);
             }
             throw new NotSupportedException(typeof(T).Name + " is not suported.");
+        }
+        public void SetValue(int val)
+        {
+            SetValue<int>(getptraddr(), hProc, val, Encoding.Default);
+        }
+        public void SetValue(long val)
+        {
+            SetValue<long>(getptraddr(), hProc, val, Encoding.Default);
+        }
+        public void SetValue(float val)
+        {
+            SetValue<float>(getptraddr(), hProc, val, Encoding.Default);
+        }
+        public void SetValue(double val)
+        {
+            SetValue<double>(getptraddr(), hProc, val, Encoding.Default);
+        }
+        public void SetValue(bool val)
+        {
+            SetValue<bool>(getptraddr(), hProc, val, Encoding.Default);
+        }
+        public void SetValue(char val)
+        {
+            SetValue<char>(getptraddr(), hProc, val, Encoding.Default);
+        }
+        public void SetValue(string val)
+        {
+            SetValue<string>(getptraddr(), hProc, val, Encoding.Default);
+        }
+        public void SetValue(short val)
+        {
+            SetValue<short>(getptraddr(), hProc, val, Encoding.Default);
+        }
+        public void SetValue(ushort val)
+        {
+            SetValue<ushort>(getptraddr(), hProc, val, Encoding.Default);
+        }
+        public void SetValue(uint val)
+        {
+            SetValue<uint>(getptraddr(), hProc, val, Encoding.Default);
+        }
+        public void SetValue(ulong val)
+        {
+            SetValue<ulong>(getptraddr(), hProc, val, Encoding.Default);
         }
         public static void SetValue<T>(IntPtr ptr, IntPtr hProc, T value, Encoding encoding)
         {
